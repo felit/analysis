@@ -2,12 +2,14 @@ gem 'nokogiri'
 require 'nokogiri'
 require 'net/http'
 require 'uri'
-require File.expand_path('../db.rb', __FILE__)
+#require File.expand_path('../db.rb', __FILE__)
 def job(url,coll)
   html=Net::HTTP.get(URI.parse(url))
   doc=Nokogiri::HTML(html)
   doc.css(".terminalpage .terminalpage-left").each do |p|
     left = p.css('.top-left')
+    city_url = left.css("span#positionCityCon a").attr('href').content rescue nil
+    city_name = left.css("span#positionCityCon a").text rescue nil
     table = left.css("table:first")
     job_name = table.css("tr:first h1").text
     company_elem = table.css("tr:eq(2) h2 a")
@@ -23,7 +25,8 @@ def job(url,coll)
       job_types.push({url: t.attr('href'), name: t.text})
     end
     content = p.css("div:eq(2) .terminalpage-content").text
-    coll.insert url:url,company_url: company_url, company_name: company_name, job_name: job_name, industries: industries, job_types: job_types, content: content
+    #coll.insert url:url,job_name:job_name,company_url: company_url, company_name: company_name, job_name: job_name, industries: industries, job_types: job_types, content: content
+    puts url:url,job_name:job_name, city_url:city_url,city_name:city_name, company_url: company_url, company_name: company_name, job_name: job_name, industries: industries, job_types: job_types, content: content
   end
 
 end
@@ -31,8 +34,8 @@ end
 puts "begining..."
 html = Net::HTTP.get(URI.parse('http://sou.zhaopin.com/jobs/searchresult.ashx?jl=%E5%8C%97%E4%BA%AC&sm=0&p=1'))
 doc = Nokogiri::HTML(html)
-db = DB.new
+#db = DB.new
 doc.css('.search-result-cont .search-result-tab .Jobname a').each do |p|
   url = p.attr('href')
-  job(url,db)
+  job(url,nil)
 end
