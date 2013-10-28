@@ -2,40 +2,57 @@ gem 'nokogiri'
 require 'nokogiri'
 require 'net/http'
 require 'uri'
-#require File.expand_path('../db.rb', __FILE__)
-def job(url,coll)
+require File.expand_path('../db.rb', __FILE__)
+require File.expand_path('../models/initialize.rb', __FILE__)
+require File.expand_path('../models/job.rb', __FILE__)
+require File.expand_path('../models/company.rb', __FILE__)
+require File.expand_path('../models/industry.rb', __FILE__)
+
+def job(url, db)
   html=Net::HTTP.get(URI.parse(url))
   doc=Nokogiri::HTML(html)
-  doc.css(".terminalpage .terminalpage-left").each do |p|
+  doc.css(".terminalpage .terminalpage-left").map do |p|
+    begin
     left = p.css('.top-left')
     city_url = left.css("span#positionCityCon a").attr('href').content rescue nil
     city_name = left.css("span#positionCityCon a").text rescue nil
     table = left.css("table:first")
-    job_name = table.css("tr:first h1").text
     company_elem = table.css("tr:eq(2) h2 a")
-    company_name = company_elem.text.strip
-    company_url = company_elem.attr('href').content
-    industries = []
+    job = Job.new(
+        id: url.match(/\d+/).to_a.first,
+        name: table.css("tr:first h1").text,
+        content: p.css("div:eq(2) .terminalpage-content").text,
+        url: url,
+        html: html,
+        publishing_at: p.css('#span4freshdate').text,
+        company_url: company_elem.attr('href').content,
+        recruited_at: Time.new
+    )
+
+    db.save_job(job)
+    company =Company.new(name: company_elem.text.strip, url: company_elem.attr('href').content)
+    db.save_company(company)
     table.css("tr:last td:last a").each do |i|
-      industries.push({url: i.attr('href'), name: i.text})
+      id = i.attr('href').match(/\d+/).to_a.first
+      db.save_industry(Industry.new(id: id, name: i.text, url: i.attr('href')))
     end
     table2 = left.css('table:last')
-    job_types = []
     table2.css("tr:last td:last a").each do |t|
-      job_types.push({url: t.attr('href'), name: t.text})
+      db.save_job_type({url: t.attr('href'), name: t.text})
     end
-    content = p.css("div:eq(2) .terminalpage-content").text
-    #coll.insert url:url,job_name:job_name,company_url: company_url, company_name: company_name, job_name: job_name, industries: industries, job_types: job_types, content: content
-    puts url:url,job_name:job_name, city_url:city_url,city_name:city_name, company_url: company_url, company_name: company_name, job_name: job_name, industries: industries, job_types: job_types, content: content
+    rescue
+    end
   end
 
 end
 
 puts "begining..."
-html = Net::HTTP.get(URI.parse('http://sou.zhaopin.com/jobs/searchresult.ashx?jl=%E5%8C%97%E4%BA%AC&sm=0&p=1'))
-doc = Nokogiri::HTML(html)
-#db = DB.new
-doc.css('.search-result-cont .search-result-tab .Jobname a').each do |p|
-  url = p.attr('href')
-  job(url,nil)
+db = DB.new
+(1..120).each do |e|
+  html = Net::HTTP.get(URI.parse("http://sou.zhaopin.com/jobs/searchresult.ashx?jl=%E5%8C%97%E4%BA%AC&sm=0&p=#{e}"))
+  doc = Nokogiri::HTML(html)
+  doc.css('.search-result-cont .search-result-tab .Jobname a').each do |p|
+    url = p.attr('href')
+    job(url, db)
+  end
 end

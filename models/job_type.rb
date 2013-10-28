@@ -1,6 +1,6 @@
-class Company
+class JobType
   include Initializable
-  @@fields=[:id, :name,:url]
+  @@fields= [:id,:name,:url]
   attr_accessor *@@fields
   def fields
     @@fields
