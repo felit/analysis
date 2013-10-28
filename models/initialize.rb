@@ -1,3 +1,4 @@
+require 'base64'
 module Initializable
   def initialize(hash)
     hash.each do |k, v|
@@ -12,5 +13,8 @@ module Initializable
       r.store(e, send(e))
       r
     end
+  end
+  def filename
+   self.class.name + "/" +  Base64.encode64(@url).gsub("\n",'') + '.html'
   end
 end

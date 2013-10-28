@@ -1,10 +1,16 @@
 class Job
-  @@fields =[:id, :url, :name, :content, :publishing_at, :recruited_at, :company_url, :industry_ids, :job_type_ids, :html]
-  attr_accessor  *@@fields
+  @@fields =[:id, :url, :name, :content, :publishing_at, :recruited_at, :company_url, :industry_ids, :job_type_ids, :html, :filename]
+  attr_accessor *@@fields
   include Initializable
+
   def fields
     @@fields
   end
+
+  def == (other)
+    return url==other.url
+  end
+
 =begin
   include Initializable
   def to_hash
