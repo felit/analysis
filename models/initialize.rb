@@ -1,4 +1,5 @@
 require 'base64'
+require 'digest'
 module Initializable
   def initialize(hash)
     hash.each do |k, v|
