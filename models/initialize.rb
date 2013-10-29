@@ -17,13 +17,10 @@ module Initializable
     end
   end
 
+  alias :to_s :to_hash
+
   def filename
     self.class.name + "/" + Base64.encode64(@url).gsub("\n", '') + '.html'
   end
 
-  def id
-    @id||= Base64.encode64(self.url).gsub(/\s/, '')
-    puts @id
-    @id
-  end
 end

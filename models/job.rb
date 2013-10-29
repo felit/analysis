@@ -1,6 +1,6 @@
 class Job
-  @@fields =[:id, :url, :name, :content, :publishing_at, :recruited_at, :company_url,
-             :job_type_ids, :html, :filename, :company_id, :industries_ids, :job_types_ids,
+  @@fields =[:key,:url, :name, :content, :publishing_at, :recruited_at,
+             :job_type_keys, :html, :filename, :company_key,
              :experience, :kind, :education, :management, :salary, :people_num, :address,]
   attr_accessor *@@fields
   include Initializable
@@ -14,10 +14,14 @@ class Job
   end
 
   def company=(company)
-    @company_id=company.id
+    @company_key=company.key
   end
 
   def job_types=(job_types)
-    @job_types_ids=job_types.map(&:id)
+    @job_types_keys=job_types.map(&:key)
+  end
+
+  def key
+    @key||= Base64.encode64(url).gsub(/\s/, '')
   end
 end

@@ -23,7 +23,6 @@ module Parser
           company_elem = table.css("h2 a")
           job_info = left.css("table:last")
           job = Job.new(
-              id: url.match(/\d+/).to_a.first,
               name: table.css("tr:first h1").text,
               content: p.css("div:eq(2) .terminalpage-content").text,
               url: job_url,
@@ -41,8 +40,7 @@ module Parser
           company = Company.new(name: company_elem.text.strip,
                                 url: company_elem.attr('href').content)
           industries = table.css("tr:last td:last a").map do |i|
-            id = i.attr('href').match(/\d+/).to_a.first
-            Industry.new(id: id, name: i.text, url: i.attr('href'))
+            Industry.new(name: i.text, url: i.attr('href'))
           end
           job.company=company
           company.industries=industries

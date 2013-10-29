@@ -9,35 +9,36 @@ module DB
     @@job_types=@@db.collection('job_types')
     @@industries=@@db.collection('industries')
     @@records = @@db.collection('records')
-    @@job_ids = @@jobs.find(fields:[:id]).map{|e|e.id}
-    @@companies_ids=@@companies.find(fields:[:id]).map{|e|e.id}
-    @@job_types_ids=@@job_types.find(fields:[:id]).map{|e|e.id}
-    @@industries_ids=@@industries.find(fields:[:id]).map{|e|e.id}
+    ids = ->(collection){collection.find({}).map{|e|e['key']}.uniq.compact}
+    @@job_keys = ids.call(@@jobs)
+    @@companies_keys=ids.call(@@companies)
+    @@job_types_keys=ids.call(@@job_types)
+    @@industries_keys=ids.call(@@industries)
 
-    def save_job(job)  ;puts job
-      unless @@job_ids.include?(job.id)
-        @@job_ids << job.id
+    def save_job(job)
+      unless @@job_keys.include?(job.key)
+        @@job_keys << job.key
         @@jobs.insert(job.to_hash)
       end
     end
 
     def save_company(company)
-      unless @@companies_ids.include?(company.id)
-        @@companies_ids << company.id
+      unless @@companies_keys.include?(company.key)
+        @@companies_keys << company.key
         @@companies.insert(company.to_hash)
       end
     end
 
     def save_job_type(job_type)
-      unless @@job_types_ids.include?(job_type.id)
-        @@job_types_ids << job_type.id
+      unless @@job_types_keys.include?(job_type.key)
+        @@job_types_keys << job_type.key
         @@job_types.insert(job_type.to_hash)
       end
     end
 
     def save_industry(industry)
-      unless @@industries_ids.include?(industry.id)
-        @@industries_ids << industry.id
+      unless @@industries_keys.include?(industry.key)
+        @@industries_keys << industry.key
         @@industries.insert(industry.to_hash)
       end
     end
