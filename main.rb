@@ -1,4 +1,5 @@
 require 'uri'
+require 'fileutils'
 require File.expand_path('parser/job_parser.rb')
 require File.expand_path('parser/zl.rb')
 require File.expand_path('basedata.rb')
@@ -8,6 +9,10 @@ require File.expand_path('models/record.rb')
 parser = Parser::Zl
 base_data = BaseData.new
 db = DB::DbMongo.new
+dir = '/home/congsl/analysis-data/html-data'
+[Job,JobType,Company,Industry].each do |e|
+  FileUtils.mkpath("#{dir}/#{e.to_s.downcase}")
+end
 base_data.selected_cities.each do |city|
   already_job_types = []
   parent_job_type_keys = []
@@ -25,10 +30,13 @@ base_data.selected_cities.each do |city|
     page = parser.new(url)
     [1..(page.total_num/30).ceil].each do |num|
       list = parser.new(url + "&p=#{num}").parse
-      #TODO 添加判断是否重复
+
       #更新记录
-      list.each do |job, company, industries, job_types| ;puts 'key:' + job.key.to_s + job.url.to_s
+      list.each do |job, company, industries, job_types|
         next unless job
+        file = File.new("#{dir}/#{job.filename}", 'w+')
+        file.write(job.html)
+        file.close
         db.save_job(job)
         db.save_company(company)
         industries.each do |industry|

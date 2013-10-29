@@ -1,8 +1,9 @@
 class Job
-  @@fields =[:key,:url, :name, :content, :publishing_at, :recruited_at,
-             :job_type_keys, :html, :filename, :company_key,
+  @@fields =[:key, :url, :name, :content, :publishing_at, :recruited_at,
+             :job_type_keys, :filename, :company_key,
              :experience, :kind, :education, :management, :salary, :people_num, :address,]
   attr_accessor *@@fields
+  attr_accessor :html
   include Initializable
 
   def fields
@@ -24,4 +25,9 @@ class Job
   def key
     @key||= Base64.encode64(url).gsub(/\s/, '')
   end
+
+  def filename
+    self.class.name.downcase + "/" + Base64.encode64(@url.sub(/http:\/\/[^\/]*\//,'')).gsub(/\n|=|\//, '') + '.html'
+  end
+
 end

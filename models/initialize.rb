@@ -20,7 +20,7 @@ module Initializable
   alias :to_s :to_hash
 
   def filename
-    self.class.name + "/" + Base64.encode64(@url).gsub("\n", '') + '.html'
+    self.class.name + "/" + Base64.encode64(@url).gsub(/\n|=|\//,'') + '.html'
   end
 
 end
