@@ -8,40 +8,35 @@ module DB
     @@companies=@@db.collection('companies')
     @@job_types=@@db.collection('job_types')
     @@industries=@@db.collection('industries')
-
-    def insert hash
-      coll = @@db.collection('zhilian')
-      id = coll.insert(hash)
-    end
+    @@job_ids = @@jobs.find(fields:[:id]).map{|e|e.id}
+    @@companies_ids=@@companies.find(fields:[:id]).map{|e|e.id}
+    @@job_types_ids=@@job_types.find(fields:[:id]).map{|e|e.id}
+    @@industries_ids=@@industries.find(fields:[:id]).map{|e|e.id}
 
     def save_job(job)
-      if (Hash === job)
-        @@jobs.insert(job)
-      else
+      unless @@job_ids.include?(job.id)
+        @@job_ids << job.id
         @@jobs.insert(job.to_hash)
       end
     end
 
     def save_company(company)
-      if (Hash === company)
-        @@companies.insert(company)
-      else
+      unless @@companies_ids.include?(company.id)
+        @@companies_ids << company.id
         @@companies.insert(company.to_hash)
       end
     end
 
     def save_job_type(job_type)
-      if (Hash === job_type)
-        @@job_types.insert(job_type)
-      else
+      unless @@job_types_ids.include?(job_type.id)
+        @@job_types_ids << job_type.id
         @@job_types.insert(job_type.to_hash)
       end
     end
 
     def save_industry(industry)
-      if (Hash === industry)
-        @@industries.insert(industry)
-      else
+      unless @@industries_ids.include?(industry.id)
+        @@industries_ids << industry.id
         @@industries.insert(industry.to_hash)
       end
     end

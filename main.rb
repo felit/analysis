@@ -2,12 +2,12 @@ require 'uri'
 require File.expand_path('parser/job_parser.rb')
 require File.expand_path('parser/zl.rb')
 require File.expand_path('basedata.rb')
-#require File.expand_path('db/db_mongo.rb')
+require File.expand_path('db/db_mongo.rb')
 require File.expand_path('models/record.rb')
 
 parser = Parser::Zl
 base_data = BaseData.new
-#db = DB::DbMongo.new
+db = DB::DbMongo.new
 number=0
 base_data.selected_cities.each do |city|
   already_job_types = []
@@ -23,23 +23,19 @@ base_data.selected_cities.each do |city|
       already_job_types << parent_job_type
     end
 
-    job, company, industries, job_types = parser.new(url).parse
-    puts url
-    number += 1
-    if number > 10
-      break
-    end
+    list = parser.new(url).parse
     #TODO 添加判断是否重复
     #更新记录
-=begin
-    db.save_job(job)
-    db.save_company(company)
-    industries.each do |industry|
-      db.save_industry(industry)
+    list.each do |job, company, industries, job_types|
+      next unless job
+      db.save_job(job)
+      db.save_company(company)
+      industries.each do |industry|
+        db.save_industry(industry)
+      end
+      job_types.each do |jt|
+        db.save_job_type(jt)
+      end
     end
-    job_types.each do |jt|
-      db.save_job_type(jt)
-    end
-=end
   end
 end
