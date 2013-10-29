@@ -6,6 +6,7 @@ require File.expand_path('../../models/job.rb',__FILE__)
 require File.expand_path('../../models/company.rb',__FILE__)
 require File.expand_path('../../models/industry.rb',__FILE__)
 require File.expand_path('../../models/job_type.rb',__FILE__)
+require File.expand_path('../../models/record.rb',__FILE__)
 module Parser
   class JobParser
     attr_accessor :url,:html,:doc

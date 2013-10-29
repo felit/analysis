@@ -8,7 +8,6 @@ require File.expand_path('models/record.rb')
 parser = Parser::Zl
 base_data = BaseData.new
 db = DB::DbMongo.new
-number=0
 base_data.selected_cities.each do |city|
   already_job_types = []
   parent_job_type_ids = []
@@ -17,6 +16,7 @@ base_data.selected_cities.each do |city|
     parent_job_type = base_data.job_types.select { |e| e[:id]==job_type[:parent] }.first
     url = "http://sou.zhaopin.com/jobs/searchresult.ashx?bj=#{parent_job_type[:id]}&jl=#{URI.encode(city[:name])}&sm=0"
     if parent_job_type_ids.include?(parent_job_type[:id]) || parser.new(url).total_num > 3600
+      db.save_record Record.new(region_id:city[:id],job_type_id:job_type[:id])
       parent_job_type_ids << parent_job_type[:id] unless parent_job_type_ids.include?(parent_job_type[:id])
       url = "http://sou.zhaopin.com/jobs/searchresult.ashx?bj=#{parent_job_type[:id]}&sj=#{job_type[:id]}&jl=#{URI.encode(city[:name])}&sm=0"
     else

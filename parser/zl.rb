@@ -6,7 +6,7 @@ module Parser
 
     def parse
       @doc.css('.search-result-cont .search-result-tab .Jobname a').map do |p|
-        job_url = p.attr('href') ;puts job_url
+        job_url = p.attr('href')
         #66
         job_url.length > 76 ? job2(job_url) : job1(job_url)
       end

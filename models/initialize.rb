@@ -23,5 +23,7 @@ module Initializable
 
   def id
     @id||= Base64.encode64(self.url).gsub(/\s/, '')
+    puts @id
+    @id
   end
 end
