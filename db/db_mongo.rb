@@ -9,7 +9,8 @@ module DB
     @@job_types=@@db.collection('job_types')
     @@industries=@@db.collection('industries')
     @@records = @@db.collection('records')
-    ids = ->(collection){collection.find({}).map{|e|e['key']}.uniq.compact}
+    @@parse_errors = @@db.collection('parse_errors')
+    ids = ->(collection) { collection.find({}).map { |e| e['key'] }.uniq.compact }
     @@job_keys = ids.call(@@jobs)
     @@companies_keys=ids.call(@@companies)
     @@job_types_keys=ids.call(@@job_types)
@@ -42,8 +43,13 @@ module DB
         @@industries.insert(industry.to_hash)
       end
     end
+
     def save_record(record)
       @@records.insert(record.to_hash)
+    end
+
+    def save_parse_error(parse_error)
+      @@parse_errors.insert(parse_error.to_hash)
     end
   end
 end

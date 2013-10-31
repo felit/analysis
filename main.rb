@@ -10,7 +10,7 @@ parser = Parser::Zl
 base_data = BaseData.new
 db = DB::DbMongo.new
 dir = '/home/congsl/analysis-data/html-data'
-[Job,JobType,Company,Industry].each do |e|
+[Job, JobType, Company, Industry].each do |e|
   FileUtils.mkpath("#{dir}/#{e.to_s.downcase}")
 end
 base_data.selected_cities.each do |city|
@@ -33,17 +33,23 @@ base_data.selected_cities.each do |city|
 
       #更新记录
       list.each do |job, company, industries, job_types|
-        next unless job
-        file = File.new("#{dir}/#{job.filename}", 'w+')
-        file.write(job.html)
-        file.close
-        db.save_job(job)
-        db.save_company(company)
-        industries.each do |industry|
-          db.save_industry(industry)
-        end
-        job_types.each do |jt|
-          db.save_job_type(jt)
+        unless job == Job
+          file = File.new("#{dir}/#{job.filename}", 'w+')
+          file.write(job.html)
+          file.close
+          db.save_job(job)
+          db.save_company(company)
+          industries.each do |industry|
+            db.save_industry(industry)
+          end
+          job_types.each do |jt|
+            db.save_job_type(jt)
+          end
+        else
+          file = File.new("#{dir}/#{job.filename}", 'w+')
+          file.write(job.html)
+          file.close
+          db.save_parse_error(job)
         end
       end
     end

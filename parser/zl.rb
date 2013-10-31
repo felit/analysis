@@ -55,7 +55,7 @@ module Parser
 
       rescue
         puts 'parse error:' + job_url
-        []
+        [ParserError.new(url:job_url,created_at:Time.new)]
       end
     end
 
@@ -88,7 +88,7 @@ module Parser
         [job, company, industries, job_types]
       rescue
         puts 'parse error:' + job_url
-        []
+        [ParserError.new(url:job_url,created_at:Time.new)]
       end
     end
   end
