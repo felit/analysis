@@ -41,13 +41,3 @@ puts selected_cities.count
 puts selected_industries.count
 puts selected_job_types.count
 puts job_types.select{|e|job_types_parent_ids.include? e[:id]}.count
-#TODO 添加判断，
-def iterator
-
-end
-[].each do |url|
-  if Parser::Zl.new(url).total_num > 3600
-
-
-  end
-end

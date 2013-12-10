@@ -1,7 +1,8 @@
 class ParserError
   include Initializable
-  @@fields =[:key, :created_at, :url, :filename]
+  @@fields =[:key, :created_at, :url, :filename,:html]
   @@md5 = Digest::MD5.new
+  attr_accessor *@@fields
 
   def fields
     @@fields

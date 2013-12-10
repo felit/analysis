@@ -12,7 +12,7 @@ class Job
   end
 
   def == (other)
-    return url==other.url
+    return url == other.url
   end
 
   def company=(company)

@@ -2,6 +2,7 @@ require 'uri'
 require 'fileutils'
 require File.expand_path('parser/job_parser.rb')
 require File.expand_path('parser/zl.rb')
+require File.expand_path('models/parser_error.rb')
 require File.expand_path('basedata.rb')
 require File.expand_path('db/db_mongo.rb')
 require File.expand_path('models/record.rb')
@@ -9,9 +10,12 @@ require File.expand_path('models/record.rb')
 parser = Parser::Zl
 base_data = BaseData.new
 db = DB::DbMongo.new
-dir = '/home/congsl/analysis-data/html-data'
+root = '/home/congsl/data'
+html_root = "#{root}/html-data"
+error_dir="#{html_root}/parsererror"
+FileUtils.mkpath(error_dir)
 [Job, JobType, Company, Industry].each do |e|
-  FileUtils.mkpath("#{dir}/#{e.to_s.downcase}")
+  FileUtils.mkpath("#{html_root}/#{e.to_s.downcase}")
 end
 base_data.selected_cities.each do |city|
   already_job_types = []
@@ -33,8 +37,8 @@ base_data.selected_cities.each do |city|
 
       #更新记录
       list.each do |job, company, industries, job_types|
-        unless job == Job
-          file = File.new("#{dir}/#{job.filename}", 'w+')
+        if job.instance_of?(Job)
+          file = File.new("#{html_root}/#{job.filename}", 'w+')
           file.write(job.html)
           file.close
           db.save_job(job)
@@ -46,7 +50,7 @@ base_data.selected_cities.each do |city|
             db.save_job_type(jt)
           end
         else
-          file = File.new("#{dir}/#{job.filename}", 'w+')
+          file = File.new("#{html_root}/#{job.filename}", 'w+')
           file.write(job.html)
           file.close
           db.save_parse_error(job)
